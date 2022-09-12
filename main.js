@@ -22,6 +22,10 @@ setTimeout(() => {
 	if (document.getElementsByClassName('wp-dark-mode-switcher').length) {
 		document.getElementsByClassName('wp-dark-mode-switcher')[0].remove();
 	}
+	
+	if (document.getElementById('UnMutePlayer')) {
+                document.getElementById('UnMutePlayer').remove();
+        }
 
 	//
 	if (document.getElementById('wp_chat')) {
