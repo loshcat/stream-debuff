@@ -2,12 +2,13 @@
 console.log('BG running');
 
 var tabOn = [];
+var frameOnly = false;
 
-browser.browserAction.onClicked.addListener(clickRun);
+chrome.browserAction.onClicked.addListener(clickRun);
 
 chrome.runtime.onMessage.addListener(refreshRun);
 
-// browser.tabs.query(
+// chrome.tabs.query(
 //   {currentWindow: true, active : true},
 //   function(tabArray){console.log(tabArray);}
 // )
@@ -27,11 +28,11 @@ function removeItemAll(arr, value) {
 function clickRun(tab) {
   console.log(tab);
   if (tabOn.includes(tab.id)) {
-    browser.tabs.sendMessage(tab.id, 'VidDeActive');
+    chrome.tabs.sendMessage(tab.id, 'VidDeActive');
     tabOn = removeItemAll(tabOn, tab.id);
   }
   else {
-    browser.tabs.sendMessage(tab.id, 'VidReActive');
+    chrome.tabs.sendMessage(tab.id, 'VidReActive');
     tabOn.push(tab.id);
   }
   console.log(tabOn);
@@ -44,13 +45,13 @@ function refreshRun(a, b, c) {
     // console.log('c ', c);
     console.log(tabOn.includes(b.tab.id), a == 'checktoactive');
     if (tabOn.includes(b.tab.id) && a == 'checktoactive') {
-      browser.tabs.sendMessage(b.tab.id, 'VidReActive');
+      chrome.tabs.sendMessage(b.tab.id, 'VidReActive');
     }
     if (a == 'reload') {
-      browser.tabs.sendMessage(b.tab.id, 'reload');
+      chrome.tabs.sendMessage(b.tab.id, 'reload');
     }
     if (a == 'escreload') {
-      browser.tabs.sendMessage(b.tab.id, 'VidDeActive');
+      chrome.tabs.sendMessage(b.tab.id, 'VidDeActive');
       tabOn = removeItemAll(tabOn, b.tab.id);
     }
 
@@ -62,7 +63,7 @@ function refreshRun(a, b, c) {
 
 chrome.runtime.onInstalled.addListener(function () {
   chrome.contextMenus.create({
-    "title": 'ReVid"',
+    "title": 'Frame Only',
     "contexts": ["all"],
     "id": "myContextMenuId"
   });
@@ -70,4 +71,8 @@ chrome.runtime.onInstalled.addListener(function () {
 
 chrome.contextMenus.onClicked.addListener(function (info, tab) {
   console.log(info, tab);
+  if (frameOnly) {frameOnly = false;} else {frameOnly = true;}
+  // chrome.tabs.create({
+  //   url: "http://www.google.com/search?q=" + encodeURIComponent(info.selectionText)
+  // });
 })
