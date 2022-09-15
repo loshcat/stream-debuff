@@ -7,8 +7,8 @@ function inIframe() {
 	}
 }
 
-// if (!inIframe()) {
-browser.runtime.onMessage.addListener(gotMess);
+if (!inIframe()) {
+chrome.runtime.onMessage.addListener(gotMess);
 function gotMess(r, s, rep) {
 	console.log(r);
 	if (r == 'VidReActive') {
@@ -23,7 +23,7 @@ function gotMess(r, s, rep) {
 				isEscape = (evt.keyCode === 27);
 			}
 			if (isEscape) {
-				browser.runtime.sendMessage('escreload');
+				chrome.runtime.sendMessage('escreload');
 				window.location.reload();
 			}
 		};
@@ -34,12 +34,13 @@ function gotMess(r, s, rep) {
 	}
 }
 
-browser.runtime.sendMessage('checktoactive');
-// }
+chrome.runtime.sendMessage('checktoactive');
+}
 
 // document.onreadystatechange = () => {
 function startVid() {
 	let activeCheck = setInterval(() => {
+		try {
 		// if (document.readyState === 'complete') {
 
 			document.body.style.margin = '0';
@@ -57,8 +58,12 @@ function startVid() {
 			if (document.getElementsByClassName('wp-dark-mode-switcher').length) {
 				document.getElementsByClassName('wp-dark-mode-switcher')[0].remove();
 			}
+			
+			if (document.getElementById('UnMutePlayer')) {
+                		document.getElementById('UnMutePlayer').remove();
+            		}
 
-			// Below is custom removal for Reddit Soccer Streams
+			//
 			if (document.getElementById('wp_chat')) {
 				document.getElementById('wp_chat').remove();
 			}
@@ -89,9 +94,27 @@ function startVid() {
 			document.body.scroll = "no"; // ie only
 
 			// Click to Load Video
-			if (document.getElementsByClassName('player-poster clickable').length) {
-				document.getElementsByClassName('player-poster clickable')[0].click();
-			}
+			if (document.getElementsByTagName('video').length) {
+				let video = document.getElementsByTagName('video')[document.getElementsByTagName('video').length - 1];
+				if (!!(video.currentTime > 0 && !video.paused && !video.ended && video.readyState > 2)) {
+					//
+				} else {
+					if (document.getElementsByClassName('player-poster clickable').length) {
+						document.getElementsByClassName('player-poster clickable')[0].click();
+					}
+					if (document.getElementsByClassName('jw-media jw-reset').length) {
+						document.getElementsByClassName('jw-media jw-reset')[0].click();
+					}
+				}
+			} 
+			 else {
+			 	if (document.getElementsByClassName('player-poster clickable').length) {
+			 		document.getElementsByClassName('player-poster clickable')[0].click();
+			 	}
+			 	if (document.getElementsByClassName('jw-media jw-reset').length) {
+			 		document.getElementsByClassName('jw-media jw-reset')[0].click();
+			 	}
+			 }
 
 			if (document.getElementsByTagName('video').length) {
 				let video = document.getElementsByTagName('video')[document.getElementsByTagName('video').length - 1];
@@ -133,12 +156,12 @@ function startVid() {
 
 			var playChecker = setInterval(() => {
 				if (document.getElementsByTagName('video').length) {
-					let video = document.getElementsByTagName('video')[0];
+					let video = document.getElementsByTagName('video')[document.getElementsByTagName('video').length - 1];
 					if (!!(video.currentTime > 0 && !video.paused && !video.ended && video.readyState > 2)) {
 						//
 					} else {
 						// window.location.reload();
-						browser.runtime.sendMessage('reload');
+						chrome.runtime.sendMessage('reload');
 					}
 				}
 			}, 3000);
@@ -169,6 +192,7 @@ function startVid() {
 				}
 			}
 			clearInterval(activeCheck);
+		} catch (e) {console.log(e);}
 		// }
 	}, 10000);
 };
