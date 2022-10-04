@@ -1,4 +1,3 @@
-// Init
 console.log('BG running');
 
 var tabOn = [];
@@ -7,11 +6,6 @@ var frameOnly = false;
 chrome.browserAction.onClicked.addListener(clickRun);
 
 chrome.runtime.onMessage.addListener(refreshRun);
-
-// chrome.tabs.query(
-//   {currentWindow: true, active : true},
-//   function(tabArray){console.log(tabArray);}
-// )
 
 function removeItemAll(arr, value) {
   let i = 0;
@@ -48,18 +42,23 @@ function refreshRun(a, b, c) {
       chrome.tabs.sendMessage(b.tab.id, 'VidReActive');
     }
     if (a == 'reload') {
-      chrome.tabs.sendMessage(b.tab.id, 'reload');
+      if (frameOnly) {
+        chrome.tabs.sendMessage(b.tab.id, 'freload');
+      } else {
+        // chrome.tabs.sendMessage(b.tab.id, 'reload');
+        chrome.tabs.reload(b.tab.id);
+      }
     }
     if (a == 'escreload') {
-      chrome.tabs.sendMessage(b.tab.id, 'VidDeActive');
+      // chrome.tabs.sendMessage(b.tab.id, 'VidDeActive');
       tabOn = removeItemAll(tabOn, b.tab.id);
+      chrome.tabs.reload(b.tab.id);
     }
 
     console.log(tabOn);
 
   } catch (e) { console.log(e) }
 }
-
 
 chrome.runtime.onInstalled.addListener(function () {
   chrome.contextMenus.create({
